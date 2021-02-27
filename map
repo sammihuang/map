@@ -1,0 +1,36 @@
+<div class="">
+距離華南考試剩下<span class='show'></span>天<br>
+距離第一考試剩下<span class='show'></span>天<!--要查幾個銀行，就要有幾個class='show'-->
+</div>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script>
+//載入jquery <script>
+$.getJSON("https://spreadsheets.google.com/feeds/list/12UiadfAtjs73-66Az_R8tqmgFndCc6csKb4DNpq8Cds/1/public/values?alt=json-in-script&callback=?",
+//紅色的地方填試算表id，請往下拉看雲端試算表的樣子那邊，藍色的是指這個試算表的第一個頁籤
+function(json){
+  var e = json.feed.entry,
+   l = e.length,
+   entry, i, bank, testdate,query,queryday,today;//預設爬出來的entry名稱是第一行的值
+  query = ["華南銀行","第一銀行"];//查找銀行，複數個用,隔開
+  for (var j = 0; j < query.length; j++) {//在所有的查詢陣列中，依序完成查找第一家銀行,第二家銀行.....
+   for (i = 0; i < l; i++) {//在所有爬出來的資料裡，一筆一筆去比對
+    entry = e[i];
+    bank = entry.gsx$bank.$t;//.$t抓文字
+    testdate = entry.gsx$testdate.$t;//.$t抓文字
+    if (bank==query[j]) {//這邊是用名稱來做比對
+     queryday = parseInt(testdate);//爬出來的資料都是文字所以要用praseInt轉成數值(在試算表中用沒有逗點的純數字會讓這邊比較簡單)
+     console.log(parseInt(testdate));//自己設置的檢查點，確定跑出來的是數字，chrome的數字在console.log中會顯示紫色
+     console.log("queryday"+testdate);//一開始設置的檢查點，確定這邊有跑到
+    };
+    if (bank=="今天日期") {//我在試算表中設置一個今天日期這樣就不用換顯示的方式
+     today = parseInt(testdate);
+     console.log(testdate);
+     console.log("today"+testdate);
+    }
+   }
+   var output = queryday - today ;//在這邊運算還有幾天
+   console.log(output);
+   document.getElementsByClassName('show')[j].innerHTML=output;//依序輸出在class='show的span裡面'
+  }
+}
+);
+</script>
